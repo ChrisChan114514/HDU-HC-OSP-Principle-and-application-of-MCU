@@ -1,0 +1,75 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        04/06/2025  20:47:08  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+D:\KEIL5\C51\BIN\BL51.EXE .\Objects\lab3.obj TO .\Objects\lab3 PRINT (.\Listings\lab3.m51)
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\lab3.obj (LAB3)
+
+
+LINK MAP OF MODULE:  .\Objects\lab3 (LAB3)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0040H     ABSOLUTE     
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\lab3 (LAB3)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        LAB3
+  C:0037H         SYMBOL        DELAY
+  C:0003H         SYMBOL        LOOP
+  C:0039H         SYMBOL        LOOP1
+  C:003BH         SYMBOL        LOOP2
+  D:0090H         SYMBOL        P1
+  C:0000H         LINE#         2
+  C:0003H         LINE#         5
+  C:0005H         LINE#         6
+  C:0007H         LINE#         7
+  C:0009H         LINE#         9
+  C:000BH         LINE#         10
+  C:000DH         LINE#         11
+  C:000FH         LINE#         13
+  C:0011H         LINE#         14
+  C:0013H         LINE#         15
+  C:0015H         LINE#         17
+  C:0017H         LINE#         18
+  C:0019H         LINE#         19
+  C:001BH         LINE#         21
+  C:001DH         LINE#         22
+  C:001FH         LINE#         23
+  C:0021H         LINE#         25
+  C:0023H         LINE#         26
+  C:0025H         LINE#         27
+  C:0027H         LINE#         29
+  C:0029H         LINE#         30
+  C:002BH         LINE#         31
+  C:002DH         LINE#         33
+  C:002FH         LINE#         35
+  C:0031H         LINE#         36
+BL51 BANKED LINKER/LOCATER V6.22                                                      04/06/2025  20:47:08  PAGE 2
+
+
+  C:0033H         LINE#         37
+  C:0035H         LINE#         39
+  C:0037H         LINE#         43
+  C:0039H         LINE#         45
+  C:003BH         LINE#         47
+  C:003DH         LINE#         48
+  C:003FH         LINE#         49
+  -------         ENDMOD        LAB3
+
+Program Size: data=8.0 xdata=0 code=64
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

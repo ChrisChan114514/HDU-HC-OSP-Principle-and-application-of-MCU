@@ -1,0 +1,53 @@
+A51 MACRO ASSEMBLER  LAB2                                                                 04/06/2025 19:36:13 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\lab2.obj
+ASSEMBLER INVOKED BY: D:\Keil5\C51\BIN\A51.EXE lab2.asm SET(SMALL) DEBUG PRINT(.\Listings\lab2.lst) OBJECT(.\Objects\lab
+                      2.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 0000H       ; 程序存储器起始地址
+0000 2100              2     AJMP MAIN       ; 绝对跳转
+                       3     
+0100                   4     ORG 0100H       ; 将后续代码定位到0100H地址
+0100                   5     MAIN:           ; 主程序入口标签
+0100 C290              6         CLR P1.0    ; 清除P1端口的第0位（P1.0输出低电平）
+0102 12010C            7         LCALL DELAY ; 长调用DELAY子程序（实现延时）
+0105 D290              8         SETB P1.0   ; 置位P1端口的第0位（P1.0输出高电平）
+0107 12010C            9         LCALL DELAY ; 再次调用DELAY子程序
+010A 80F4             10         SJMP MAIN   ; 短跳转回MAIN标签（无限循环）
+                      11     
+                      12     ; 学号后两位=47，延时公式：(47 + 50)*2 = 194ms
+010C                  13     DELAY:
+010C 7FC2             14         MOV R7, #194      ; 外层循环194次（每次约1ms）
+010E                  15     DLY_LOOP:
+010E 7EFA             16         MOV R6, #250      ; 内层循环250次
+0110 00               17         NOP               ; 微调（1μs）
+0111                  18     DLY_INNER:
+0111 DEFE             19         DJNZ R6, DLY_INNER ; 内层循环250次 × 2μs = 500μs
+0113 DFF9             20         DJNZ R7, DLY_LOOP  ; 外层循环194次 × (500μs + 其他) ≈ 194ms
+0115 22               21         RET
+                      22     
+                      23     
+                      24     END             ; 程序结束标记
+A51 MACRO ASSEMBLER  LAB2                                                                 04/06/2025 19:36:13 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+DELAY. . . . . . .  C ADDR   010CH   A   
+DLY_INNER. . . . .  C ADDR   0111H   A   
+DLY_LOOP . . . . .  C ADDR   010EH   A   
+MAIN . . . . . . .  C ADDR   0100H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)
