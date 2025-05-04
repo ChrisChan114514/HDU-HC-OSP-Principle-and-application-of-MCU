@@ -1,0 +1,74 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        05/04/2025  15:09:45  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+D:\KEIL5\C51\BIN\BL51.EXE .\Objects\lab1.obj TO .\Objects\lab3 PRINT (.\Listings\lab3.m51)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\lab1.obj (LAB1)
+  D:\KEIL5\C51\LIB\C51S.LIB (?C_STARTUP)
+
+
+LINK MAP OF MODULE:  .\Objects\lab3 (LAB1)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            IDATA   0008H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     0044H     UNIT         ?PR?MAIN?LAB1
+            CODE    0047H     000CH     UNIT         ?C_C51STARTUP
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\lab3 (LAB1)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?LAB1
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\lab3 (LAB1)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        LAB1
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  C:0003H         PUBLIC        main
+  -------         PROC          MAIN
+  -------         DO            
+  D:0007H         SYMBOL        i
+  -------         ENDDO         
+  C:0003H         LINE#         7
+  C:0003H         LINE#         11
+  C:0005H         LINE#         12
+  C:0015H         LINE#         13
+  C:0019H         LINE#         16
+  C:001BH         LINE#         17
+BL51 BANKED LINKER/LOCATER V6.22                                                      05/04/2025  15:09:45  PAGE 2
+
+
+  C:002EH         LINE#         18
+  C:0032H         LINE#         21
+  C:0034H         LINE#         22
+  C:0041H         LINE#         23
+  C:0045H         LINE#         25
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        LAB1
+
+Program Size: data=9.0 xdata=0 code=83
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

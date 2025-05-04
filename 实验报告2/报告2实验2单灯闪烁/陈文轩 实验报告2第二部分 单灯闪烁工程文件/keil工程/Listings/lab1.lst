@@ -1,0 +1,55 @@
+C51 COMPILER V9.54   LAB1                                                                  05/04/2025 15:52:58 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE LAB1
+OBJECT MODULE PLACED IN .\Objects\lab1.obj
+COMPILER INVOKED BY: D:\Keil5\C51\BIN\C51.EXE lab1.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\lab1.l
+                    -st) TABS(2) OBJECT(.\Objects\lab1.obj)
+
+line level    source
+
+   1          #include <reg51.h>  // 51单片机头文件
+   2          
+   3          sbit LED = P1^0;    // LED连接P1.0
+   4          
+   5          // 定时器初始化（方式1，16位定时器）
+   6          void Timer0_Init() {
+   7   1          TMOD |= 0x01;    // 定时器0，模式1
+   8   1          TH0 = 0x3C;      // 定时50ms（12MHz晶振）
+   9   1          TL0 = 0xB0;
+  10   1          ET0 = 1;         // 允许定时器0中断
+  11   1          EA = 1;          // 全局中断使能
+  12   1          TR0 = 1;         // 启动定时器0
+  13   1      }
+  14          
+  15          // 定时器0中断服务程序
+  16          void Timer0_ISR() interrupt 1 {
+  17   1          static unsigned int count = 0;
+  18   1          TH0 = 0x3C;      // 重新装载初值
+  19   1          TL0 = 0xB0;
+  20   1          count++;
+  21   1          if (count >= 20) {  // 20*50ms = 1s
+  22   2              count = 0;
+  23   2              LED = ~LED;     // LED状态取反
+  24   2          }
+  25   1      }
+  26          
+  27          void main() {
+  28   1          LED = 0;          // 初始状态（LED灭）
+  29   1          Timer0_Init();    // 初始化定时器
+  30   1          while (1);        // 主循环（中断驱动）
+  31   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     63    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

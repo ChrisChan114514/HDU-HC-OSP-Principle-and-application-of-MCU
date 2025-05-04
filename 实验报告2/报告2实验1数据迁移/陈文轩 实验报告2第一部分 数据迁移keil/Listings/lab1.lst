@@ -1,0 +1,50 @@
+C51 COMPILER V9.54   LAB1                                                                  05/04/2025 15:09:06 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE LAB1
+OBJECT MODULE PLACED IN .\Objects\lab1.obj
+COMPILER INVOKED BY: D:\Keil5\C51\BIN\C51.EXE lab1.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\lab1.l
+                    -st) TABS(2) OBJECT(.\Objects\lab1.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          
+   3          #define EXTERNAL_START  0x1000
+   4          #define INTERNAL_START  0x30
+   5          #define DATA_LENGTH     49  // 从0x1000到0x1030，共49字节
+   6          
+   7          void main() {
+   8   1          unsigned char i;
+   9   1          
+  10   1          // 1. 初始化片外RAM：写入测试数据
+  11   1          for (i = 0; i < DATA_LENGTH; i++) {
+  12   2              *((unsigned char xdata *)(EXTERNAL_START + i)) = i+1;  // 存入0xFF
+  13   2          }
+  14   1      
+  15   1          // 2. 从片外RAM读取，写入片内RAM
+  16   1          for (i = 0; i < DATA_LENGTH; i++) {
+  17   2              *((unsigned char idata *)(INTERNAL_START + i)) = *((unsigned char xdata *)(EXTERNAL_START + i));
+  18   2          }
+  19   1      
+  20   1          // 3. 清零片外RAM
+  21   1          for (i = 0; i < DATA_LENGTH; i++) {
+  22   2              *((unsigned char xdata *)(EXTERNAL_START + i)) = 0x00;
+  23   2          }
+  24   1      
+  25   1          while (1);  // 停止程序运行，便于调试观察
+  26   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     68    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,115 @@
+A51 MACRO ASSEMBLER  LAB3                                                                 05/03/2025 22:36:51 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\lab3.obj
+ASSEMBLER INVOKED BY: D:\Keil5\C51\BIN\A51.EXE lab3.asm SET(SMALL) DEBUG PRINT(.\Listings\lab3.lst) OBJECT(.\Objects\lab
+                      3.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     ORG 0H          ; 程序起始地址设置为0000H（复位向量地址）
+0000 7590FF            2     MOV P1, #0FFH   ; 初始化P1端口：向P1写入FFH（所有引脚置高电平，LED全灭
+                             ）
+                       3     
+0003                   4     LOOP:           ; 主循环开始标签
+0003 7401              5         MOV A, #01H ; 将立即数01H（0000 0001B）送入累加器A（准备点亮P1.0）
+0005 1137              6         ACALL DELAY ; 调用延时子程序（保持当前状态一段时间）
+0007 F590              7         MOV P1, A   ; 将A的值输出到P1端口（P1.0=0，对应LED亮，其他引脚保持�
+                             ��电平）
+                       8         
+0009 7402              9         MOV A, #02H ; 将02H（0000 0010B）送入A（准备点亮P1.1）
+000B 1137             10         ACALL DELAY 
+000D F590             11         MOV P1, A   ; P1.1=0，LED亮
+                      12         
+000F 7404             13         MOV A, #04H ; 04H（0000 0100B）→ A（准备点亮P1.2）
+0011 1137             14         ACALL DELAY
+0013 F590             15         MOV P1, A   ; P1.2=0
+                      16         
+0015 7408             17         MOV A, #08H ; 08H（0000 1000B）→ A（准备点亮P1.3）
+0017 1137             18         ACALL DELAY
+0019 F590             19         MOV P1, A   ; P1.3=0
+                      20         
+001B 7410             21         MOV A, #10H ; 10H（0001 0000B）→ A（准备点亮P1.4）
+001D 1137             22         ACALL DELAY
+001F F590             23         MOV P1, A   ; P1.4=0
+                      24         
+0021 7420             25         MOV A, #20H ; 20H（0010 0000B）→ A（准备点亮P1.5）
+0023 1137             26         ACALL DELAY
+0025 F590             27         MOV P1, A   ; P1.5=0
+                      28         
+0027 7440             29         MOV A, #40H ; 40H（0100 0000B）→ A（准备点亮P1.6）
+0029 1137             30         ACALL DELAY
+002B F590             31         MOV P1, A   ; P1.6=0
+                      32         
+002D 1137             33         ACALL DELAY ; 额外延时（保持P1.6状态）
+                      34         
+002F 7480             35         MOV A, #80H ; 80H（1000 0000B）→ A（准备点亮P1.7）
+0031 1137             36         ACALL DELAY
+0033 F590             37         MOV P1, A   ; P1.7=0
+                      38         
+0035 80CC             39         SJMP LOOP   ; 无条件跳转回LOOP标签（无限循环）
+                      40     
+                      41     ; ====== 延时子程序 ======
+0037                  42     DELAY:
+0037 7AFF             43         MOV R2, #0FFH ; 设置外层循环计数器R2=255
+0039                  44     LOOP1:
+0039 79FF             45         MOV R1, #0FFH ; 设置内层循环计数器R1=255
+003B                  46     LOOP2:
+003B D9FE             47         DJNZ R1, LOOP2 ; R1减1，若R1≠0则跳转至LOOP2（内层循环255次）
+003D DAFA             48         DJNZ R2, LOOP1 ; R2减1，若R2≠0则跳转至LOOP1（外层循环255次）
+003F 22               49         RET           ; 返回主程序
+                      50             
+                      51             
+                      52             
+                      53             
+                      54             
+                      55             
+A51 MACRO ASSEMBLER  LAB3                                                                 05/03/2025 22:36:51 PAGE     2
+
+                      56             
+                      57             
+                      58             
+                      59             
+                      60             
+                      61             
+                      62             
+                      63             
+                      64             
+                      65             
+                      66             
+                      67             
+                      68             
+                      69             
+                      70             
+                      71             
+                      72             
+                      73             
+                      74             
+                      75             
+                      76             
+                      77             
+                      78             
+                      79             
+                      80             
+                      81             
+*** WARNING #A41 IN 81 (lab3.asm, LINE 81): MISSING 'END' STATEMENT
+A51 MACRO ASSEMBLER  LAB3                                                                 05/03/2025 22:36:51 PAGE     3
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+DELAY. . . . . . .  C ADDR   0037H   A   
+LOOP . . . . . . .  C ADDR   0003H   A   
+LOOP1. . . . . . .  C ADDR   0039H   A   
+LOOP2. . . . . . .  C ADDR   003BH   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  1 WARNING(S), 0 ERROR(S)
