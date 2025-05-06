@@ -1,0 +1,53 @@
+C51 COMPILER V9.54   LAB1                                                                  05/04/2025 18:04:54 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE LAB1
+OBJECT MODULE PLACED IN .\Objects\lab1.obj
+COMPILER INVOKED BY: D:\Keil5\C51\BIN\C51.EXE lab1.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\lab1.l
+                    -st) TABS(2) OBJECT(.\Objects\lab1.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          
+   3          // 精确定义（集中管理可调参数）
+   4          #define FOSC        12000000UL  // 晶振12MHz
+   5          #define STUDENT_END 47          // 学号后两位
+   6          #define WAVE_MS     (20 + STUDENT_END)/2 // 周期67ms 这里是半周期 所以除2 
+   7          #define HALF_US     (WAVE_MS * 500)    // 半周期33500μs
+   8          #define T0_LOAD     (65536 - HALF_US)  // 定时器初值32036
+   9          
+  10          // 硬件接口定义
+  11          sbit WAVE_OUT = P1^0;
+  12          
+  13          void main() {
+  14   1          // 定时器初始化（使用宏计算）
+  15   1          TMOD = 0x01;               // T0方式1
+  16   1          TH0 = T0_LOAD / 256;       // 高字节=0x7D
+  17   1          TL0 = T0_LOAD % 256;       // 低字节=0x24
+  18   1          TR0 = 1;                   // 启动定时器
+  19   1          WAVE_OUT = 0;              // 初始电平
+  20   1      
+  21   1          while(1) {
+  22   2              while(!TF0);           // 阻塞查询溢出标志
+  23   2              TF0 = 0;               // 清除标志
+  24   2              WAVE_OUT = ~WAVE_OUT;  // 翻转输出
+  25   2              // 重装初值（保持宏一致性）
+  26   2              TH0 = T0_LOAD / 256;
+  27   2              TL0 = T0_LOAD % 256;
+  28   2          }
+  29   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     28    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

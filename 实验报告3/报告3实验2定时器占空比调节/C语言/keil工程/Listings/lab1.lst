@@ -1,0 +1,75 @@
+C51 COMPILER V9.54   LAB1                                                                  05/06/2025 11:32:41 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE LAB1
+OBJECT MODULE PLACED IN .\Objects\lab1.obj
+COMPILER INVOKED BY: D:\Keil5\C51\BIN\C51.EXE lab1.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\lab1.l
+                    -st) TABS(2) OBJECT(.\Objects\lab1.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          
+   3          // 宏定义
+   4          #define FOSC 6000000       // 振荡频率 6MHz
+   5          #define STUDENT_ID 17      // 学号后两位
+   6          #define DUTY_CYCLE (10 + STUDENT_ID) // 占空比 = 10 + 学号后两位
+   7          #define PERIOD_MS 120*2      // 输出波形周期 120ms 但是0.5ms定时，所以乘2
+   8          
+   9          // 定时器初值计算
+  10          #define TIMER_RELOAD (256 - (FOSC / 12 / 2000)) // 定时器重装值，0.5ms定时
+  11          
+  12          sbit P2_0 = P2^0; // 定义P2.0口
+  13          
+  14          unsigned int high_time = 0; // 高电平时间
+  15          unsigned int low_time = 0;  // 低电平时间
+  16          
+  17          void Timer1_ISR(void) interrupt 3 {
+  18   1          static unsigned int counter = 0; // 定时器计数器
+  19   1          counter++;
+  20   1      
+  21   1          if (P2_0 == 1 && counter >= high_time) {
+  22   2              P2_0 = 0; // 切换为低电平
+  23   2              counter = 0;
+  24   2              TH1 = TIMER_RELOAD; // 重装定时器初值
+  25   2          } else if (P2_0 == 0 && counter >= low_time) {
+  26   2              P2_0 = 1; // 切换为高电平
+  27   2              counter = 0;
+  28   2              TH1 = TIMER_RELOAD; // 重装定时器初值
+  29   2          }
+  30   1      }
+  31          
+  32          void main() {
+  33   1          unsigned int total_time = PERIOD_MS; // 总周期时间
+  34   1          high_time = (total_time * DUTY_CYCLE) / 100; // 高电平时间
+  35   1          low_time = total_time - high_time;          // 低电平时间
+  36   1      
+  37   1          TMOD = 0x20; // 定时器1，方式2（8位自动重装）
+  38   1          TH1 = TIMER_RELOAD; // 初始化定时器初值
+  39   1          TL1 = TIMER_RELOAD;
+  40   1          ET1 = 1; // 使能定时器1中断
+  41   1          EA = 1;  // 开启总中断
+  42   1          TR1 = 1; // 启动定时器1
+  43   1      
+  44   1          P2_0 = 1; // 初始状态为高电平
+  45   1      
+  46   1          while (1) {
+  47   2              // 主循环，所有逻辑在中断中处理
+  48   2          }
+  49   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    109    ----
+   CONSTANT SIZE    =   ----    ----
+C51 COMPILER V9.54   LAB1                                                                  05/06/2025 11:32:41 PAGE 2   
+
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      6    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

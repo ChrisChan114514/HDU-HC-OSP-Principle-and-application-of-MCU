@@ -1,0 +1,125 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        05/06/2025  11:32:42  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+D:\KEIL5\C51\BIN\BL51.EXE .\Objects\lab1.obj TO .\Objects\lab3 PRINT (.\Listings\lab3.m51)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\lab1.obj (LAB1)
+  D:\KEIL5\C51\LIB\C51S.LIB (?C_STARTUP)
+  D:\KEIL5\C51\LIB\C51S.LIB (?C?IMUL)
+  D:\KEIL5\C51\LIB\C51S.LIB (?C?UIDIV)
+  D:\KEIL5\C51\LIB\C51S.LIB (?C_INIT)
+
+
+LINK MAP OF MODULE:  .\Objects\lab3 (LAB1)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0006H     UNIT         ?DT?LAB1
+            IDATA   000EH     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     000DH     UNIT         ?C_INITSEG
+                    0010H     000BH                  *** GAP ***
+            CODE    001BH     0003H     ABSOLUTE     
+            CODE    001EH     008CH     UNIT         ?C_C51STARTUP
+            CODE    00AAH     0067H     UNIT         ?C?LIB_CODE
+            CODE    0111H     003AH     UNIT         ?PR?TIMER1_ISR?LAB1
+            CODE    014BH     0033H     UNIT         ?PR?MAIN?LAB1
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\lab3 (LAB1)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?LAB1
+  +--> ?C_INITSEG
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\lab3 (LAB1)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        LAB1
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:00A0H         PUBLIC        P2
+BL51 BANKED LINKER/LOCATER V6.22                                                      05/06/2025  11:32:42  PAGE 2
+
+
+  C:0111H         PUBLIC        Timer1_ISR
+  B:00A8H.7       PUBLIC        EA
+  B:00A0H.0       PUBLIC        P2_0
+  C:014BH         PUBLIC        main
+  D:000AH         PUBLIC        high_time
+  D:0089H         PUBLIC        TMOD
+  B:00A8H.3       PUBLIC        ET1
+  D:008DH         PUBLIC        TH1
+  D:008BH         PUBLIC        TL1
+  B:0088H.6       PUBLIC        TR1
+  D:000CH         PUBLIC        low_time
+  -------         PROC          TIMER1_ISR
+  -------         DO            
+  D:0008H         SYMBOL        counter
+  -------         ENDDO         
+  C:0111H         LINE#         17
+  C:0115H         LINE#         19
+  C:011DH         LINE#         21
+  C:0129H         LINE#         22
+  C:012BH         LINE#         23
+  C:012BH         LINE#         24
+  C:012BH         LINE#         25
+  C:013BH         LINE#         26
+  C:013DH         LINE#         27
+  C:0143H         LINE#         28
+  C:0146H         LINE#         29
+  C:0146H         LINE#         30
+  -------         ENDPROC       TIMER1_ISR
+  -------         PROC          MAIN
+  -------         DO            
+  D:0002H         SYMBOL        total_time
+  -------         ENDDO         
+  C:014BH         LINE#         32
+  C:014BH         LINE#         33
+  C:014BH         LINE#         34
+  C:015FH         LINE#         35
+  C:016BH         LINE#         37
+  C:016EH         LINE#         38
+  C:0171H         LINE#         39
+  C:0174H         LINE#         40
+  C:0176H         LINE#         41
+  C:0178H         LINE#         42
+  C:017AH         LINE#         44
+  C:017CH         LINE#         46
+  C:017CH         LINE#         48
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        LAB1
+
+  -------         MODULE        ?C?IMUL
+  C:00AAH         PUBLIC        ?C?IMUL
+  -------         ENDMOD        ?C?IMUL
+
+  -------         MODULE        ?C?UIDIV
+  C:00BCH         PUBLIC        ?C?UIDIV
+  -------         ENDMOD        ?C?UIDIV
+
+Program Size: data=15.0 xdata=0 code=371
+BL51 BANKED LINKER/LOCATER V6.22                                                      05/06/2025  11:32:42  PAGE 3
+
+
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

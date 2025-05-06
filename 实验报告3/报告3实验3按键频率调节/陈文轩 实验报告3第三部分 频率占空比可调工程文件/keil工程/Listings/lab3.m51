@@ -1,0 +1,120 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        05/06/2025  20:20:54  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+D:\KEIL5\C51\BIN\BL51.EXE .\Objects\lab1.obj TO .\Objects\lab3 PRINT (.\Listings\lab3.m51)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\lab1.obj (LAB1)
+  D:\KEIL5\C51\LIB\C51S.LIB (?C_STARTUP)
+  D:\KEIL5\C51\LIB\C51S.LIB (?C_INIT)
+
+
+LINK MAP OF MODULE:  .\Objects\lab3 (LAB1)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0003H     UNIT         ?DT?LAB1
+            IDATA   000BH     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     0003H     ABSOLUTE     
+                    0006H     0005H                  *** GAP ***
+            CODE    000BH     0003H     ABSOLUTE     
+            CODE    000EH     008CH     UNIT         ?C_C51STARTUP
+            CODE    009AH     005FH     UNIT         ?PR?TIMER0_ISR?LAB1
+            CODE    00F9H     0017H     UNIT         ?PR?MAIN?LAB1
+            CODE    0110H     000CH     UNIT         ?PR?INT0_ISR?LAB1
+            CODE    011CH     0008H     UNIT         ?C_INITSEG
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\lab3 (LAB1)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?LAB1
+  +--> ?C_INITSEG
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\lab3 (LAB1)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        LAB1
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:00A0H         PUBLIC        P2
+  C:009AH         PUBLIC        Timer0_ISR
+BL51 BANKED LINKER/LOCATER V6.22                                                      05/06/2025  20:20:54  PAGE 2
+
+
+  B:00A8H.7       PUBLIC        EA
+  B:00A0H.0       PUBLIC        P2_0
+  C:00F9H         PUBLIC        main
+  D:000AH         PUBLIC        mode
+  D:0089H         PUBLIC        TMOD
+  B:00A8H.1       PUBLIC        ET0
+  D:008CH         PUBLIC        TH0
+  B:00A8H.0       PUBLIC        EX0
+  B:0088H.0       PUBLIC        IT0
+  D:008AH         PUBLIC        TL0
+  B:0088H.4       PUBLIC        TR0
+  C:0110H         PUBLIC        INT0_ISR
+  -------         PROC          INT0_ISR
+  C:0110H         LINE#         15
+  C:0112H         LINE#         16
+  C:0119H         LINE#         17
+  -------         ENDPROC       INT0_ISR
+  -------         PROC          TIMER0_ISR
+  -------         DO            
+  D:0008H         SYMBOL        counter_1HZ
+  -------         ENDDO         
+  C:009AH         LINE#         20
+  C:00A5H         LINE#         22
+  C:00BCH         LINE#         26
+  C:00D3H         LINE#         31
+  C:00D8H         LINE#         32
+  C:00D8H         LINE#         33
+  C:00E0H         LINE#         34
+  C:00E6H         LINE#         35
+  C:00E6H         LINE#         36
+  C:00EAH         LINE#         37
+  C:00ECH         LINE#         39
+  C:00ECH         LINE#         40
+  C:00EEH         LINE#         42
+  C:00EEH         LINE#         43
+  C:00F0H         LINE#         44
+  C:00F0H         LINE#         46
+  -------         ENDPROC       TIMER0_ISR
+  -------         PROC          MAIN
+  C:00F9H         LINE#         48
+  C:00F9H         LINE#         50
+  C:00FBH         LINE#         51
+  C:00FDH         LINE#         52
+  C:00FFH         LINE#         55
+  C:0102H         LINE#         56
+  C:0105H         LINE#         57
+  C:0108H         LINE#         58
+  C:010AH         LINE#         59
+  C:010CH         LINE#         61
+  C:010EH         LINE#         63
+  C:010EH         LINE#         65
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        LAB1
+
+Program Size: data=12.0 xdata=0 code=287
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

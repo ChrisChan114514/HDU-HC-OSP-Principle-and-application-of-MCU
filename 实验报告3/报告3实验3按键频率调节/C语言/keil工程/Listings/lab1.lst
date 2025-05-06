@@ -1,0 +1,207 @@
+C51 COMPILER V9.54   LAB1                                                                  05/06/2025 20:20:54 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE LAB1
+OBJECT MODULE PLACED IN .\Objects\lab1.obj
+COMPILER INVOKED BY: D:\Keil5\C51\BIN\C51.EXE lab1.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\lab1.l
+                    -st) TABS(2) OBJECT(.\Objects\lab1.obj)
+
+line level    source
+
+   1          
+   2          #include <reg51.h>
+   3          
+   4          // 宏定义
+   5          #define FOSC 12000000       // 晶振频率 12MHz
+   6          #define TIMER_RELOAD_1KHZ (65536 - FOSC / 12 / 2 / 1000 /2) // 1KHz定时器初值 因为是半周期
+   7          #define TIMER_RELOAD_100HZ (65536 - FOSC / 12 / 2 / 100 /2) // 100Hz定时器初值
+   8          #define TIMER_RELOAD_10HZ (65536 - FOSC / 12 / 2 / 10 /2)   // 10Hz定时器初值
+   9          //#define TIMER_RELOAD_1HZ (65536 - FOSC / 12 / 2 / 1 /2)     // 1Hz定时器初值 250,000超出范围了
+  10          //因为是半周期翻转电平 所以再乘以2补偿
+  11          sbit P2_0 = P2^0; // 方波输出引脚
+  12          unsigned char mode = 0; // 模式切换变量
+  13          
+  14          // 外部中断1服务函数
+  15          void INT0_ISR(void) interrupt 0 {
+  16   1          mode = (mode + 1) % 4; // 模式循环切换
+  17   1      }
+  18          
+  19          // 定时器0中断服务函数
+  20          void Timer0_ISR(void) interrupt 1 {
+  21   1          static int counter_1HZ=0; //基于10HZ的分频，计数十次就是1HZ
+  22   1          TH0 = (mode == 0) ? (TIMER_RELOAD_1KHZ >> 8) :
+  23   1                (mode == 1) ? (TIMER_RELOAD_100HZ >> 8) :
+  24   1                (mode == 2) ? (TIMER_RELOAD_10HZ >> 8) :
+  25   1                              (TIMER_RELOAD_10HZ >> 8);
+  26   1          TL0 = (mode == 0) ? (TIMER_RELOAD_1KHZ & 0xFF) :
+  27   1                (mode == 1) ? (TIMER_RELOAD_100HZ & 0xFF) :
+  28   1                (mode == 2) ? (TIMER_RELOAD_10HZ & 0xFF) :
+  29   1                              (TIMER_RELOAD_10HZ & 0xFF);
+  30   1        
+  31   1          if (mode==3) //1HZ
+  32   1          {
+  33   2            counter_1HZ++;
+  34   2            if (counter_1HZ==10)
+  35   2            {
+  36   3              counter_1HZ=0;
+  37   3              P2_0 = ~P2_0;
+  38   3              
+  39   3            }
+  40   2          }
+  41   1          else
+  42   1          {
+  43   2            P2_0 = ~P2_0; // 其他模式，直接翻转P2.0引脚电平
+  44   2          }
+  45   1          
+  46   1      }
+  47          
+  48          void main() {
+  49   1          // 初始化外部中断1
+  50   1          IT0 = 1;  // 下降沿触发
+  51   1          EX0 = 1;  // 使能外部中断0
+  52   1          EA = 1;   // 开启总中断
+  53   1      
+  54   1          // 初始化定时器0
+C51 COMPILER V9.54   LAB1                                                                  05/06/2025 20:20:54 PAGE 2   
+
+  55   1          TMOD = 0x01; // 定时器0，模式1（16位定时）
+  56   1          TH0 = TIMER_RELOAD_1KHZ >> 8;
+  57   1          TL0 = TIMER_RELOAD_1KHZ & 0xFF;
+  58   1          ET0 = 1; // 使能定时器0中断
+  59   1          TR0 = 1; // 启动定时器0
+  60   1      
+  61   1          P2_0 = 0; // 初始化P2.0为低电平
+  62   1      
+  63   1          while (1) {
+  64   2              // 主循环，所有逻辑在中断中处理
+  65   2          }
+  66   1      }
+  67          
+  68          
+  69          /*
+  70          //拓展程序 占空比可调版本
+  71          #include <reg51.h>
+  72          
+  73          // 宏定义
+  74          #define FOSC 12000000       // 晶振频率 12MHz
+  75          #define TIMER_RELOAD_1KHZ (65536 - 1 ) // 1KHz定时器初值（半周期） 
+  76          //中断程序时间占用 影响频率较大 适当调参 但是周期是1.5ms左右
+  77          #define TIMER_RELOAD_100HZ (65536 - FOSC / 12 / 2 / 1000 ) // 100Hz定时器初值
+  78          #define TIMER_RELOAD_10HZ (65536 - FOSC / 12 / 2 / 100 )   // 10Hz定时器初值
+  79          //因为是半周期翻转电平 所以再除以2补偿
+  80          
+  81          sbit P2_0 = P2^0; // 方波输出引脚
+  82          unsigned char mode = 0;       // 模式切换变量
+  83          unsigned char duty_cycle = 50; // 占空比，初始为50%
+  84          
+  85          // 外部中断0服务函数（切换频率模式）
+  86          void INT0_ISR(void) interrupt 0 {
+  87              mode = (mode + 1) % 4; // 模式循环切换
+  88          }
+  89          
+  90          // 外部中断1服务函数（切换占空比）
+  91          void INT1_ISR(void) interrupt 2 {
+  92              duty_cycle += 10; // 占空比增加10%
+  93              if (duty_cycle > 90) {
+  94                  duty_cycle = 10; // 超过90%后回到10%
+  95              }
+  96          }
+  97          
+  98          // 定时器0中断服务函数
+  99          void Timer0_ISR(void) interrupt 1 {
+ 100              static unsigned int high_count = 0; // 高电平计数
+ 101              static unsigned int low_count = 0;  // 低电平计数
+ 102              static unsigned char state = 0;     // 当前状态：0为高电平，1为低电平
+ 103              static int counter_1HZ = 0;         // 基于10Hz的分频计数
+ 104          
+ 105              // 根据模式设置定时器初值
+ 106              unsigned int timer_reload = (mode == 0) ? TIMER_RELOAD_1KHZ :
+ 107                                          (mode == 1) ? TIMER_RELOAD_100HZ :
+ 108                                          (mode == 2) ? TIMER_RELOAD_10HZ :
+ 109                                                        TIMER_RELOAD_10HZ; // 1Hz基于10Hz分频
+ 110          
+ 111              TH0 = timer_reload >> 8;
+ 112              TL0 = timer_reload & 0xFF;
+ 113          
+ 114              if (mode == 3) { // 1Hz模式
+ 115                  counter_1HZ++;
+ 116                  if (counter_1HZ == 10) { // 10Hz分频为1Hz
+C51 COMPILER V9.54   LAB1                                                                  05/06/2025 20:20:54 PAGE 3   
+
+ 117                      counter_1HZ = 0;
+ 118                      if (state == 0) { // 高电平状态
+ 119                          high_count++;
+ 120                          if (high_count >= duty_cycle / 10) { // 高电平持续时间达到占空比
+ 121                              high_count = 0;
+ 122                              state = 1; // 切换到低电平
+ 123                              P2_0 = 0;
+ 124                          }
+ 125                      } else { // 低电平状态
+ 126                          low_count++;
+ 127                          if (low_count >= (10 - duty_cycle / 10)) { // 低电平持续时间达到占空比
+ 128                              low_count = 0;
+ 129                              state = 0; // 切换到高电平
+ 130                              P2_0 = 1;
+ 131                          }
+ 132                      }
+ 133                  }
+ 134              } else { // 其他模式
+ 135                  if (state == 0) { // 高电平状态
+ 136                      high_count++;
+ 137                      if (high_count >= duty_cycle / 10) { // 高电平持续时间达到占空比
+ 138                          high_count = 0;
+ 139                          state = 1; // 切换到低电平
+ 140                          P2_0 = 0;
+ 141                      }
+ 142                  } else { // 低电平状态
+ 143                      low_count++;
+ 144                      if (low_count >= (10 - duty_cycle / 10)) { // 低电平持续时间达到占空比
+ 145                          low_count = 0;
+ 146                          state = 0; // 切换到高电平
+ 147                          P2_0 = 1;
+ 148                      }
+ 149                  }
+ 150              }
+ 151          }
+ 152          
+ 153          void main() {
+ 154              // 初始化外部中断0（切换频率模式）
+ 155              IT0 = 1;  // 下降沿触发
+ 156              EX0 = 1;  // 使能外部中断0
+ 157          
+ 158              // 初始化外部中断1（切换占空比）
+ 159              IT1 = 1;  // 下降沿触发
+ 160              EX1 = 1;  // 使能外部中断1
+ 161          
+ 162              // 初始化总中断
+ 163              EA = 1;   // 开启总中断
+ 164          
+ 165              // 初始化定时器0
+ 166              TMOD = 0x01; // 定时器0，模式1（16位定时）
+ 167              TH0 = TIMER_RELOAD_1KHZ >> 8;
+ 168              TL0 = TIMER_RELOAD_1KHZ & 0xFF;
+ 169              ET0 = 1; // 使能定时器0中断
+ 170              TR0 = 1; // 启动定时器0
+ 171          
+ 172              P2_0 = 0; // 初始化P2.0为低电平
+ 173          
+ 174              while (1) {
+ 175                  // 主循环，所有逻辑在中断中处理
+ 176              }
+ 177          }*/
+
+C51 COMPILER V9.54   LAB1                                                                  05/06/2025 20:20:54 PAGE 4   
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    130    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,65 @@
+A51 MACRO ASSEMBLER  LAB1                                                                 05/06/2025 10:52:14 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.02c
+OBJECT MODULE PLACED IN .\Objects\lab1.obj
+ASSEMBLER INVOKED BY: D:\Keil5\C51\BIN\A51.EXE lab1.a51 SET(SMALL) DEBUG PRINT(.\Listings\lab1.lst) OBJECT(.\Objects\lab
+                      1.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ; 宏/常量定义
+  1B00                 2     CLK_FREQ    EQU 12000000   ; 12MHz
+  416E                 3     HALF_PERIOD EQU 16750     ; 半周期33.5ms (周期=20+47ms)
+  BE91                 4     T0_RELOAD   EQU 65535-HALF_PERIOD  ; 计算初值
+  0090                 5     PORT_PIN    EQU P1.0       ; 输出引脚
+                       6     
+0000                   7     ORG 0000H
+0000 020030            8     LJMP MAIN
+000B                   9     ORG 000BH
+000B 020043           10     LJMP T0_ISR
+                      11     
+0030                  12     ORG 0030H
+0030                  13     MAIN:
+0030 758901           14         MOV TMOD, #01H        ; T0方式1
+0033 758CBE           15         MOV TH0, #(T0_RELOAD >> 8)   ;高八位赋值
+0036 758A91           16         MOV TL0, #(T0_RELOAD & 0FFH) ;低八位赋值
+0039 D2A9             17         SETB ET0              ; 允许T0中断
+003B D2AF             18         SETB EA               ; 开中断
+003D D28C             19         SETB TR0              ; 启动T0
+003F C290             20         CLR PORT_PIN          ; 初始低电平
+0041 80FE             21         SJMP $                ; 等待中断
+                      22     
+0043                  23     T0_ISR:
+0043 B290             24         CPL PORT_PIN          ; 取反输出
+0045 758CBE           25         MOV TH0, #(T0_RELOAD >> 8)  ; 重装初值
+0048 758A91           26         MOV TL0, #(T0_RELOAD & 0FFH)
+004B 32               27         RETI
+                      28     END
+A51 MACRO ASSEMBLER  LAB1                                                                 05/06/2025 10:52:14 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+CLK_FREQ . . . . .  N NUMB   1B00H   A   
+EA . . . . . . . .  B ADDR   00A8H.7 A   
+ET0. . . . . . . .  B ADDR   00A8H.1 A   
+HALF_PERIOD. . . .  N NUMB   416EH   A   
+MAIN . . . . . . .  C ADDR   0030H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+PORT_PIN . . . . .  B ADDR   0090H.0 A   
+T0_ISR . . . . . .  C ADDR   0043H   A   
+T0_RELOAD. . . . .  N NUMB   BE91H   A   
+TH0. . . . . . . .  D ADDR   008CH   A   
+TL0. . . . . . . .  D ADDR   008AH   A   
+TMOD . . . . . . .  D ADDR   0089H   A   
+TR0. . . . . . . .  B ADDR   0088H.4 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)
