@@ -1,0 +1,157 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        05/07/2025  14:52:40  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+D:\KEIL5\C51\BIN\BL51.EXE .\Objects\main.obj TO .\Objects\Project PRINT (.\Listings\Project.m51) RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\main.obj (MAIN)
+  D:\KEIL5\C51\LIB\C51S.LIB (?C_STARTUP)
+  D:\KEIL5\C51\LIB\C51S.LIB (?C?UIDIV)
+  D:\KEIL5\C51\LIB\C51S.LIB (?C_INIT)
+
+
+LINK MAP OF MODULE:  .\Objects\Project (MAIN)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0008H     UNIT         ?DT?MAIN
+            IDATA   0010H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     00CFH     UNIT         ?PR?SCANKEYS?MAIN
+            CODE    00D2H     008CH     UNIT         ?C_C51STARTUP
+            CODE    015EH     0055H     UNIT         ?C?LIB_CODE
+            CODE    01B3H     0038H     UNIT         ?PR?MAIN?MAIN
+            CODE    01EBH     000AH     UNIT         ?C_INITSEG
+            CODE    01F5H     000AH     UNIT         ?CO?MAIN
+            CODE    01FFH     0007H     UNIT         ?PR?DELAY?MAIN
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\Project (MAIN)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?MAIN
+  +--> ?C_INITSEG
+
+?PR?MAIN?MAIN
+  +--> ?PR?SCANKEYS?MAIN
+  +--> ?CO?MAIN
+  +--> ?PR?DELAY?MAIN
+
+?PR?SCANKEYS?MAIN
+  +--> ?PR?DELAY?MAIN
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\Project (MAIN)
+BL51 BANKED LINKER/LOCATER V6.22                                                      05/07/2025  14:52:40  PAGE 2
+
+
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        MAIN
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0080H         PUBLIC        P0
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  C:01F5H         PUBLIC        Tab
+  D:0008H         PUBLIC        Dat
+  C:0003H         PUBLIC        ScanKeys
+  C:01B3H         PUBLIC        main
+  D:000CH         PUBLIC        KeyState
+  D:000DH         PUBLIC        tmp
+  D:000EH         PUBLIC        i
+  C:01FFH         PUBLIC        Delay
+  -------         PROC          DELAY
+  -------         DO            
+  D:0007H         SYMBOL        i
+  -------         ENDDO         
+  C:01FFH         LINE#         16
+  C:01FFH         LINE#         17
+  C:01FFH         LINE#         19
+  C:0205H         LINE#         20
+  -------         ENDPROC       DELAY
+  -------         PROC          SCANKEYS
+  C:0003H         LINE#         22
+  C:0003H         LINE#         23
+  C:0003H         LINE#         25
+  C:000DH         LINE#         26
+  C:000DH         LINE#         27
+  C:0010H         LINE#         28
+  C:0015H         LINE#         29
+  C:0015H         LINE#         30
+  C:0026H         LINE#         31
+  C:0026H         LINE#         32
+  C:0026H         LINE#         33
+  C:0038H         LINE#         36
+  C:0040H         LINE#         37
+  C:0040H         LINE#         38
+  C:0043H         LINE#         39
+  C:0048H         LINE#         40
+  C:0048H         LINE#         41
+  C:0059H         LINE#         42
+  C:0059H         LINE#         43
+  C:0059H         LINE#         44
+  C:006BH         LINE#         47
+  C:0073H         LINE#         48
+  C:0073H         LINE#         49
+  C:0076H         LINE#         50
+  C:007BH         LINE#         51
+  C:007BH         LINE#         52
+  C:008CH         LINE#         53
+  C:008CH         LINE#         54
+  C:008CH         LINE#         55
+  C:009EH         LINE#         58
+BL51 BANKED LINKER/LOCATER V6.22                                                      05/07/2025  14:52:40  PAGE 3
+
+
+  C:00A6H         LINE#         59
+  C:00A6H         LINE#         60
+  C:00A9H         LINE#         61
+  C:00AEH         LINE#         62
+  C:00AEH         LINE#         63
+  C:00BFH         LINE#         64
+  C:00BFH         LINE#         65
+  C:00BFH         LINE#         66
+  C:00D1H         LINE#         67
+  -------         ENDPROC       SCANKEYS
+  -------         PROC          MAIN
+  C:01B3H         LINE#         69
+  C:01B3H         LINE#         70
+  C:01B3H         LINE#         71
+  C:01B3H         LINE#         72
+  C:01B3H         LINE#         73
+  C:01B6H         LINE#         75
+  C:01B9H         LINE#         76
+  C:01BEH         LINE#         77
+  C:01BEH         LINE#         78
+  C:01C1H         LINE#         79
+  C:01CDH         LINE#         80
+  C:01D3H         LINE#         81
+  C:01D6H         LINE#         82
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        MAIN
+
+  -------         MODULE        ?C?UIDIV
+  C:015EH         PUBLIC        ?C?UIDIV
+  -------         ENDMOD        ?C?UIDIV
+
+Program Size: data=17.0 xdata=0 code=518
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,98 @@
+C51 COMPILER V9.54   MAIN                                                                  05/07/2025 14:02:32 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main.l
+                    -st) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <reg51.h>//单片机头文件
+   2          unsigned char code Tab[]={0xC0,0xF9,0xA4,0xB0,0x99,0x92,0x82,0xF8,0x80,0x90};//共阳数码管码段表
+   3          unsigned char Dat[]={2,0,2,4};//存放4位数字数组
+   4           
+   5          int i ,t;//定义变量，作为循环，定时计数
+   6          unsigned char tmp;//定义片选变量
+   7          unsigned char second=0,min=0;//定义秒、分变量
+   8          void Delay()//延时子程序，作为数码管显示延迟
+   9          {
+  10   1        unsigned char i;
+  11   1        for(i=0;i<250;i++);
+  12   1      }
+  13           
+  14          void main()
+  15          {
+  16   1      //  IT0=1;EX0=1;//开外部中断0和外部中断0允许
+  17   1      //  IT1=1;EX1=1;//开外部中断1和外部中断1允许
+  18   1      //  EA=1;//允许所有中断
+  19   1      //  ET0=1;//允许T0中断
+  20   1      //  TMOD=0x01;//T0方式1计时0.05S
+  21   1      //  TH0=-50000/256;//定时器T0的高八位
+  22   1      //  TL0=-50000%256;//定时器T0的低八位
+  23   1      //  TR0=1;//启动定时器0
+  24   1        while(1)//无限循环
+  25   1        {
+  26   2          tmp=0x01;//片选初值
+  27   2          for(i=0;i<4;i++)//循环4次
+  28   2          {
+  29   3            P2=tmp;//片选初值
+  30   3            P0=Tab[Dat[i]];//输出某一位数字的码段值
+  31   3            tmp=tmp<<1;//片选值左移一位
+  32   3            Delay();//调用延时
+  33   3          }
+  34   2        }
+  35   1      }
+  36           
+  37          //void intserv1 (void) interrupt 1 using 1//定时器0中断服务子程序
+  38          //{
+  39          //  TH0=-50000/256;//定时器高八位赋值
+  40          //  TL0=-50000%256;//定时器低八位赋值
+  41          //  t++;//变量t加1
+  42          //  if(t==20)//20次到，即1秒到
+  43          //  {
+  44          //    t=0;//变量t清零
+  45          //    second++;//秒加1
+  46          //    if(second>=60)//60秒到
+  47          //    {
+  48          //      second=0;//秒变量清零
+  49          //      min++;//分加1
+  50          //      if(min>=60)//60分到
+  51          //        min=0;//分变量清零
+  52          //    }
+  53          //    Dat[0]=min/10;//计算分高位
+  54          //    Dat[1]=min%10;//计算分低位
+C51 COMPILER V9.54   MAIN                                                                  05/07/2025 14:02:32 PAGE 2   
+
+  55          //    Dat[2]=second/10;//计算秒高位
+  56          //    Dat[3]=second%10;//计算秒低位
+  57          //  }
+  58          //}
+  59          // 
+  60          //void intersvr0 (void) interrupt 0 using 1//外部中断0子程序
+  61          //{
+  62          //  min++;//分加1
+  63          //  if(min>=60)//如果分到60
+  64          //    min=0;//分清零
+  65          //}
+  66          // 
+  67          //void intersvr1 (void) interrupt 2 using 1//外部中断1子程序
+  68          //{
+  69          //  second++;//秒加1
+  70          //  if(second>=60)//如果秒到60
+  71          //    second=0;//秒清零
+  72          //}
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     60    ----
+   CONSTANT SIZE    =     10    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     11    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

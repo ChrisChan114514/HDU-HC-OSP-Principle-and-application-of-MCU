@@ -1,0 +1,70 @@
+C51 COMPILER V9.54   SEG                                                                   05/06/2025 20:56:03 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE SEG
+OBJECT MODULE PLACED IN .\Objects\seg.obj
+COMPILER INVOKED BY: D:\Keil5\C51\BIN\C51.EXE seg.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\seg.lst
+                    -) TABS(2) OBJECT(.\Objects\seg.obj)
+
+line level    source
+
+   1          #include "seg.h"
+   2          
+   3          //74HC138的ABC引脚
+   4          sbit HCA = P2^2;
+   5          sbit HCB = P2^3;
+   6          sbit HCC = P2^4;
+   7          
+   8          #define SEG P1
+   9          
+  10          //共阴极数码管段码 0 1 2 3 4 5 6 7 8 9 空
+  11          u8 code segCode[] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x00};
+  12          //u8 code segCode[] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x77,0x7c,0x39,0x5e,0x79,0x71};
+  13          //存储数据的缓存
+  14          u8 segBuff[8] = {0};
+  15          
+  16          /**
+  17            * @name    SegShow
+  18            * @brief   数码管的显示函数，该函数放置在2MS定时器中执行，每2MS切换一次显示位
+  19            * @param   
+  20            * @retval  
+  21            */
+  22          void SegShow()
+  23          {
+  24   1        static u8 segSelectCount = 0;//位选变量
+  25   1        
+  26   1        segSelectCount ++;
+  27   1        if(segSelectCount > 7)
+  28   1          segSelectCount = 0;
+  29   1      
+  30   1        SEG = 0x00;//消隐
+  31   1        switch (segSelectCount)
+  32   1        {
+  33   2          case 0: HCC = 0;HCB = 0;HCA = 0;SEG = segCode[segBuff[0]];break;
+  34   2          case 1: HCC = 0;HCB = 0;HCA = 1;SEG = segCode[segBuff[1]];break;
+  35   2          case 2: HCC = 0;HCB = 1;HCA = 0;SEG = segCode[segBuff[2]];break;
+  36   2          case 3: HCC = 0;HCB = 1;HCA = 1;SEG = segCode[segBuff[3]];break;
+  37   2          case 4: HCC = 1;HCB = 0;HCA = 0;SEG = segCode[segBuff[4]];break;
+  38   2          case 5: HCC = 1;HCB = 0;HCA = 1;SEG = segCode[segBuff[5]];break;
+  39   2          case 6: HCC = 1;HCB = 1;HCA = 0;SEG = segCode[segBuff[6]];break;
+  40   2          case 7: HCC = 1;HCB = 1;HCA = 1;SEG = segCode[segBuff[7]];break;
+  41   2          default:HCC = 0;HCB = 0;HCA = 0;SEG = segCode[segBuff[0]];break;
+  42   2        }
+  43   1      }
+  44          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    140    ----
+   CONSTANT SIZE    =     11    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      9    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+C51 COMPILER V9.54   SEG                                                                   05/06/2025 20:56:03 PAGE 2   
+
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

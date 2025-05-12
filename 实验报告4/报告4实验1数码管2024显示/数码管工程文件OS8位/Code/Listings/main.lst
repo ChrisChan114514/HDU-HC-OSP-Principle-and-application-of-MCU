@@ -1,0 +1,102 @@
+C51 COMPILER V9.54   MAIN                                                                  05/07/2025 13:34:17 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main.l
+                    -st) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /**
+   2            ************************************* Copyright ****************************** 
+   3            *
+   4            *                 (C) Copyright 2022, LQH, China, GCU.
+   5            *                                All Rights Reserved
+   6            *                              
+   7            *                                      By LQH
+   8            *                       
+   9            * FileName   : main.c     
+  10            * Author     : 少年潜行(snqx-lgh)     
+  11            * Date       : 2022-07-03         
+  12            * Description: CSDN主页： https://blog.csdn.net/wan1234512?type=blog
+  13                     Gitee地址：https://gitee.com/snqx-lqh
+  14            ******************************************************************************
+  15            */
+  16          #include <reg52.h>
+  17          #include "main.h"
+  18          
+  19          #include "seg.h"
+  20          
+  21          #ifndef u8
+              #define u8  unsigned char
+              #endif
+  24          
+  25          #ifndef u16
+              #define u16 unsigned int
+              #endif
+  28          
+  29          void Timer0_Init(void);
+  30          void segBuffChange(void);
+  31          
+  32          void main()
+  33          {
+  34   1        Timer0_Init();
+  35   1        while(1)
+  36   1        {
+  37   2      
+  38   2        }
+  39   1      }
+  40          
+  41          /**
+  42            * @name    SegBuffChange
+  43            * @brief   根据显示状态变量，修改现在的显示变量
+  44            * @param   : [输入/出] 
+  45            * @retval  返回值
+  46            */
+  47          void SegBuffChange()
+  48          {
+  49   1        segBuff[7] = 4;
+  50   1        segBuff[6] = 2;
+  51   1        segBuff[5] = 0;
+  52   1        segBuff[4] = 2;
+  53   1        segBuff[3] = 4;
+  54   1        segBuff[2] = 2;
+C51 COMPILER V9.54   MAIN                                                                  05/07/2025 13:34:17 PAGE 2   
+
+  55   1        segBuff[1] = 0;
+  56   1        segBuff[0] = 2;
+  57   1      }
+  58          
+  59          //仿真中用5ms，实际用2ms
+  60          void Timer0_Init(void)    //5毫秒@11.0592MHz
+  61          {
+  62   1        TMOD |= 0x01;     //设置定时器模式
+  63   1        TL0 = 0x00;       //设置定时初始值
+  64   1        TH0 = 0xEE;       //设置定时初始值
+  65   1        TF0 = 0;        //清除TF0标志
+  66   1        TR0 = 1;        //定时器0开始计时
+  67   1        ET0 = 1;
+  68   1          EA = 1;
+  69   1      }
+  70          void Timer0() interrupt 1
+  71          {
+  72   1        TL0 = 0x00;       //设置定时初始值
+  73   1        TH0 = 0xEE;       //设置定时初始值
+  74   1        segBuffChange();//显示BUFF改变
+  75   1        SegShow();//数码管显示
+  76   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    115    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,111 @@
+C51 COMPILER V9.54   MAIN                                                                  05/07/2025 14:52:40 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main.l
+                    -st) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <reg51.h> // 单片机头文件
+   2          
+   3          unsigned char code Tab[] = {0xC0, 0xF9, 0xA4, 0xB0, 0x99, 0x92, 0x82, 0xF8, 0x80, 0x90}; // 共阳数码管码段
+             -表
+   4          unsigned char Dat[] = {0, 0, 0, 0}; // 存放4位数字数组
+   5          
+   6          int i; // 定义变量，作为循环
+   7          unsigned char tmp; // 定义片选变量
+   8          
+   9          unsigned char KeyState = 0x0F; // 按键状态变量，初始值为高电平（未按下）
+  10          
+  11          #define KEY1 (P1 & 0x01) // 按键1连接到 P1.0
+  12          #define KEY2 (P1 & 0x02) // 按键2连接到 P1.1
+  13          #define KEY3 (P1 & 0x04) // 按键3连接到 P1.2
+  14          #define KEY4 (P1 & 0x08) // 按键4连接到 P1.3
+  15          
+  16          void Delay() // 延时子程序，作为数码管显示延迟
+  17          {
+  18   1          unsigned char i;
+  19   1          for (i = 0; i < 250; i++);
+  20   1      }
+  21          
+  22          void ScanKeys() // 按键扫描函数
+  23          {
+  24   1          // 检测按键1（P1.0）
+  25   1          if ((KeyState & 0x01) && !KEY1) // 上一次状态为高电平，当前为低电平
+  26   1          {
+  27   2              Delay(); // 消抖
+  28   2              if (!KEY1) // 再次确认按键按下
+  29   2              {
+  30   3                  Dat[0] = (Dat[0] + 1) % 10; // 第一位数字加1
+  31   3              }
+  32   2          }
+  33   1          KeyState = (KeyState & ~0x01) | (KEY1 ? 0x01 : 0x00); // 更新按键1状态
+  34   1      
+  35   1          // 检测按键2（P1.1）
+  36   1          if ((KeyState & 0x02) && !KEY2) // 上一次状态为高电平，当前为低电平
+  37   1          {
+  38   2              Delay(); // 消抖
+  39   2              if (!KEY2) // 再次确认按键按下
+  40   2              {
+  41   3                  Dat[1] = (Dat[1] + 1) % 10; // 第二位数字加1
+  42   3              }
+  43   2          }
+  44   1          KeyState = (KeyState & ~0x02) | (KEY2 ? 0x02 : 0x00); // 更新按键2状态
+  45   1      
+  46   1          // 检测按键3（P1.2）
+  47   1          if ((KeyState & 0x04) && !KEY3) // 上一次状态为高电平，当前为低电平
+  48   1          {
+  49   2              Delay(); // 消抖
+  50   2              if (!KEY3) // 再次确认按键按下
+  51   2              {
+  52   3                  Dat[2] = (Dat[2] + 1) % 10; // 第三位数字加1
+  53   3              }
+C51 COMPILER V9.54   MAIN                                                                  05/07/2025 14:52:40 PAGE 2   
+
+  54   2          }
+  55   1          KeyState = (KeyState & ~0x04) | (KEY3 ? 0x04 : 0x00); // 更新按键3状态
+  56   1      
+  57   1          // 检测按键4（P1.3）
+  58   1          if ((KeyState & 0x08) && !KEY4) // 上一次状态为高电平，当前为低电平
+  59   1          {
+  60   2              Delay(); // 消抖
+  61   2              if (!KEY4) // 再次确认按键按下
+  62   2              {
+  63   3                  Dat[3] = (Dat[3] + 1) % 10; // 第四位数字加1
+  64   3              }
+  65   2          }
+  66   1          KeyState = (KeyState & ~0x08) | (KEY4 ? 0x08 : 0x00); // 更新按键4状态
+  67   1      }
+  68          
+  69          void main()
+  70          {
+  71   1          while (1) // 无限循环
+  72   1          {
+  73   2              ScanKeys(); // 调用按键扫描函数
+  74   2      
+  75   2              tmp = 0x01; // 片选初值
+  76   2              for (i = 0; i < 4; i++) // 循环4次
+  77   2              {
+  78   3                  P2 = tmp; // 片选初值
+  79   3                  P0 = Tab[Dat[i]]; // 输出某一位数字的码段值
+  80   3                  tmp = tmp << 1; // 片选值左移一位
+  81   3                  Delay(); // 调用延时
+  82   3              }
+  83   2          }
+  84   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    270    ----
+   CONSTANT SIZE    =     10    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      8    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
