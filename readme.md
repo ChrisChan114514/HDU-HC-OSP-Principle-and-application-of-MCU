@@ -48,4 +48,19 @@ ChrisChan
 
 ChrisChan
 
+## 实验反馈（一、二、三）
+
+![6418005a3465b7a7f41f7dc739c50b2](D:\Game\PublicGithub\HDU_HonerCollege_OpenSource_Plan\HDU-HC-OSP-Principle-and-application-of-MCU\assets\6418005a3465b7a7f41f7dc739c50b2.png)
+
+![image-20250520103522502](D:\Game\PublicGithub\HDU_HonerCollege_OpenSource_Plan\HDU-HC-OSP-Principle-and-application-of-MCU\assets\image-20250520103522502.png)
+
+![image-20250520103532731](D:\Game\PublicGithub\HDU_HonerCollege_OpenSource_Plan\HDU-HC-OSP-Principle-and-application-of-MCU\assets\image-20250520103532731.png)
+
+**感谢老师**，他讲的实验课我一节没去，自己做的，其实也有一知半解。
+
+ChrisChan
+
+2025/05/20 (想她吗？😂)
+
+
 
