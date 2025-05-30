@@ -1,0 +1,151 @@
+C51 COMPILER V9.54   MAIN                                                                  05/30/2025 20:51:41 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main.l
+                    -st) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          #define DATA P2
+   3          #define STUDENT_ID 47   // 学号定义为47
+   4          
+   5          // 波形输出总时间 = (学号 + 20)ms
+   6          #define TOTAL_TIME (STUDENT_ID/1.375 + 20)  // 单位：ms
+   7          unsigned char mode = 0;  // 0:自定义波形, 1:锯齿波, 2:三角波
+   8          
+   9          // 自定义波形表 - 从+1V到+2V再到0V
+  10          // 0V对应值为0，1V对应值为128，2V对应值为255
+  11          unsigned char code customWave[256] = {
+  12              // 0-15: 起始点(+1V)到上升过程
+  13              128, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188,
+  14              // 16-31: 继续上升
+  15              192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252,
+  16              // 32-47: 到达峰值(+2V)并开始下降
+  17              255, 255, 250, 245, 240, 235, 230, 225, 220, 215, 210, 205, 200, 195, 190, 185,
+  18              // 48-63: 继续下降
+  19              180, 175, 170, 165, 160, 155, 150, 145, 140, 135, 130, 125, 120, 115, 110, 105,
+  20              // 64-79: 继续下降
+  21              100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25,
+  22              // 80-95: 接近0V
+  23              20, 15, 10, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  24              // 96-111: 保持0V一段时间
+  25              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  26              // 112-127: 开始回升
+  27              5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80,
+  28              // 128-143: 继续回升
+  29              85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140, 145, 150, 155, 160,
+  30              // 144-159: 继续回升至起始点(+1V)
+  31              165, 170, 175, 180, 185, 190, 195, 200, 205, 210, 215, 220, 225, 230, 235, 240,
+  32              // 160-255: 保持1V电平直到循环结束
+  33              128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128,
+  34              128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128,
+  35              128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128,
+  36              128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128,
+  37              128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128,
+  38              128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128
+  39          };
+  40          
+  41          
+  42          unsigned int timer_count = 0;  // 定时器计数
+  43          
+  44          // 计算锯齿波数据
+  45          unsigned char getSawWave(unsigned char i)
+  46          {
+  47   1          // 锯齿波是线性上升的波形
+  48   1          return i;  // 值从0线性增加到255
+  49   1      }
+  50          
+  51          // 计算三角波数据
+  52          unsigned char getTriangleWave(unsigned char i)
+  53          {
+  54   1          if(i < 128)
+C51 COMPILER V9.54   MAIN                                                                  05/30/2025 20:51:41 PAGE 2   
+
+  55   1              return i << 1;  // 0-255上升段
+  56   1          else
+  57   1              return 255 - ((i - 128) << 1);  // 255-0下降段
+  58   1      }
+  59          
+  60          // 定时器0初始化
+  61          void Timer0Init()
+  62          {
+  63   1          TMOD = 0x01;    // 设置定时器0为模式1（16位定时器）
+  64   1          EA = 1;         // 开总中断
+  65   1          ET0 = 1;        // 开定时器0中断
+  66   1          TR0 = 1;        // 启动定时器0
+  67   1      }
+  68          
+  69          // 设置定时器初值，使每个点的延时为 TOTAL_TIME/256 ms
+  70          void setTimer0()
+  71          {
+  72   1          unsigned int delay_us = (TOTAL_TIME * 1000UL) / 256;  // 每个点的延时（微秒）
+  73   1          unsigned int reload_value;
+  74   1          
+  75   1          // 假设使用12MHz晶振，每个机器周期为1us
+  76   1          reload_value = 65536 - delay_us;
+  77   1          TH0 = (unsigned char)(reload_value >> 8);
+  78   1          TL0 = (unsigned char)reload_value;
+  79   1      }
+  80          
+  81          // 定时器0中断服务函数
+  82          void Timer0_ISR() interrupt 1
+  83          {
+  84   1          timer_count = 1;  // 设置标志，表示延时完成
+  85   1          setTimer0();      // 重新设置定时器初值
+  86   1      }
+  87           
+  88          void main()
+  89          {
+  90   1          unsigned char i;
+  91   1          unsigned char waveData;
+  92   1          
+  93   1          Timer0Init();   // 初始化定时器
+  94   1          setTimer0();    // 设置定时器初值
+  95   1          
+  96   1          while(1)
+  97   1          {
+  98   2              for(i=0;i<256;i++)
+  99   2              {
+ 100   3                  // 根据mode选择波形
+ 101   3                  switch(mode)
+ 102   3                  {
+ 103   4                      case 0:  // 自定义波形（使用预先计算好的波形表）
+ 104   4                          waveData = customWave[i];
+ 105   4                          break;
+ 106   4                      case 1:  // 锯齿波
+ 107   4                          waveData = getSawWave(i);
+ 108   4                          break;
+ 109   4                      case 2:  // 三角波
+ 110   4                          waveData = getTriangleWave(i);
+ 111   4                          break;
+ 112   4                      default:
+ 113   4                          waveData = customWave[i];  // 默认使用自定义波形
+ 114   4                          break;
+ 115   4                  }
+ 116   3                  DATA = waveData;
+C51 COMPILER V9.54   MAIN                                                                  05/30/2025 20:51:41 PAGE 3   
+
+ 117   3                  
+ 118   3                  // 等待定时器中断发生（延时结束）
+ 119   3                  timer_count = 0;
+ 120   3                  while(!timer_count); 
+ 121   3              }
+ 122   2          }
+ 123   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    146    ----
+   CONSTANT SIZE    =    256    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

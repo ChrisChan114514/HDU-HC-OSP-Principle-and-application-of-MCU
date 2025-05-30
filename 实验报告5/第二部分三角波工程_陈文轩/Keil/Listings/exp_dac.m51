@@ -1,0 +1,213 @@
+BL51 BANKED LINKER/LOCATER V6.22                                                        05/30/2025  20:51:41  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22, INVOKED BY:
+D:\KEIL5\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\main.obj TO .\Objects\exp_dac PRINT (.\Listings\exp_dac.m51)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\STARTUP.obj (?C_STARTUP)
+  .\Objects\main.obj (MAIN)
+  D:\KEIL5\C51\LIB\C51S.LIB (?C_INIT)
+
+
+LINK MAP OF MODULE:  .\Objects\exp_dac (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0003H     UNIT         ?DT?MAIN
+            IDATA   000BH     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+            CODE    0003H     0008H     UNIT         ?C_INITSEG
+            CODE    000BH     0003H     ABSOLUTE     
+            CODE    000EH     0100H     UNIT         ?CO?MAIN
+            CODE    010EH     008CH     UNIT         ?C_C51STARTUP
+            CODE    019AH     0045H     UNIT         ?PR?MAIN?MAIN
+            CODE    01DFH     001DH     UNIT         ?PR?TIMER0_ISR?MAIN
+            CODE    01FCH     0016H     UNIT         ?PR?_GETTRIANGLEWAVE?MAIN
+            CODE    0212H     000FH     UNIT         ?PR?SETTIMER0?MAIN
+            CODE    0221H     000AH     UNIT         ?PR?TIMER0INIT?MAIN
+            CODE    022BH     0001H     UNIT         ?PR?_GETSAWWAVE?MAIN
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\exp_dac (?C_STARTUP)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?MAIN
+  +--> ?C_INITSEG
+
+?PR?MAIN?MAIN
+  +--> ?PR?TIMER0INIT?MAIN
+  +--> ?PR?SETTIMER0?MAIN
+  +--> ?PR?_GETSAWWAVE?MAIN
+  +--> ?PR?_GETTRIANGLEWAVE?MAIN
+  +--> ?CO?MAIN
+
+*** NEW ROOT ***************************************************
+
+BL51 BANKED LINKER/LOCATER V6.22                                                      05/30/2025  20:51:41  PAGE 2
+
+
+?PR?TIMER0_ISR?MAIN
+  +--> ?PR?SETTIMER0?MAIN
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\exp_dac (?C_STARTUP)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:010EH         SEGMENT       ?C_C51STARTUP
+  I:000BH         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+  C:0111H         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:010EH         SYMBOL        STARTUP1
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:010EH         LINE#         133
+  C:0110H         LINE#         134
+  C:0111H         LINE#         135
+  C:0112H         LINE#         136
+  C:0114H         LINE#         185
+  C:0117H         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+
+  -------         MODULE        MAIN
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:00A0H         PUBLIC        P2
+  C:0212H         PUBLIC        setTimer0
+  C:01DFH         PUBLIC        Timer0_ISR
+  C:022BH         PUBLIC        _getSawWave
+  B:00A8H.7       PUBLIC        EA
+  C:01FCH         PUBLIC        _getTriangleWave
+  C:019AH         PUBLIC        main
+  D:0008H         PUBLIC        mode
+  D:0009H         PUBLIC        timer_count
+  C:000EH         PUBLIC        customWave
+  D:0089H         PUBLIC        TMOD
+BL51 BANKED LINKER/LOCATER V6.22                                                      05/30/2025  20:51:41  PAGE 3
+
+
+  B:00A8H.1       PUBLIC        ET0
+  C:0221H         PUBLIC        Timer0Init
+  D:008CH         PUBLIC        TH0
+  D:008AH         PUBLIC        TL0
+  B:0088H.4       PUBLIC        TR0
+  -------         PROC          _GETSAWWAVE
+  D:0007H         SYMBOL        i
+  C:022BH         LINE#         45
+  C:022BH         LINE#         46
+  C:022BH         LINE#         48
+  C:022BH         LINE#         49
+  -------         ENDPROC       _GETSAWWAVE
+  -------         PROC          _GETTRIANGLEWAVE
+  D:0007H         SYMBOL        i
+  C:01FCH         LINE#         52
+  C:01FCH         LINE#         53
+  C:01FCH         LINE#         54
+  C:0203H         LINE#         55
+  C:0207H         LINE#         57
+  C:0211H         LINE#         58
+  -------         ENDPROC       _GETTRIANGLEWAVE
+  -------         PROC          TIMER0INIT
+  C:0221H         LINE#         61
+  C:0221H         LINE#         62
+  C:0221H         LINE#         63
+  C:0224H         LINE#         64
+  C:0226H         LINE#         65
+  C:0228H         LINE#         66
+  C:022AH         LINE#         67
+  -------         ENDPROC       TIMER0INIT
+  -------         PROC          SETTIMER0
+  -------         DO            
+  D:0006H         SYMBOL        delay_us
+  D:0004H         SYMBOL        reload_value
+  -------         ENDDO         
+  C:0212H         LINE#         70
+  C:0212H         LINE#         71
+  C:0212H         LINE#         72
+  C:0212H         LINE#         76
+  C:021CH         LINE#         77
+  C:021EH         LINE#         78
+  C:0220H         LINE#         79
+  -------         ENDPROC       SETTIMER0
+  -------         PROC          TIMER0_ISR
+  C:01DFH         LINE#         82
+  C:01EAH         LINE#         84
+  C:01F0H         LINE#         85
+  C:01F3H         LINE#         86
+  -------         ENDPROC       TIMER0_ISR
+  -------         PROC          MAIN
+  -------         DO            
+  D:0005H         SYMBOL        i
+  D:0006H         SYMBOL        waveData
+  -------         ENDDO         
+  C:019AH         LINE#         88
+  C:019AH         LINE#         89
+  C:019AH         LINE#         93
+BL51 BANKED LINKER/LOCATER V6.22                                                      05/30/2025  20:51:41  PAGE 4
+
+
+  C:019DH         LINE#         94
+  C:01A0H         LINE#         96
+  C:01A0H         LINE#         97
+  C:01A0H         LINE#         98
+  C:01A9H         LINE#         99
+  C:01A9H         LINE#         101
+  C:01B5H         LINE#         102
+  C:01B5H         LINE#         103
+  C:01B5H         LINE#         104
+  C:01B5H         LINE#         105
+  C:01B7H         LINE#         106
+  C:01B7H         LINE#         107
+  C:01BEH         LINE#         108
+  C:01C0H         LINE#         109
+  C:01C0H         LINE#         110
+  C:01C7H         LINE#         111
+  C:01C9H         LINE#         112
+  C:01C9H         LINE#         113
+  C:01CFH         LINE#         114
+  C:01CFH         LINE#         115
+  C:01CFH         LINE#         116
+  C:01D1H         LINE#         119
+  C:01D6H         LINE#         120
+  C:01DCH         LINE#         121
+  -------         ENDPROC       MAIN
+  -------         ENDMOD        MAIN
+
+Program Size: data=12.0 xdata=0 code=556
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)
