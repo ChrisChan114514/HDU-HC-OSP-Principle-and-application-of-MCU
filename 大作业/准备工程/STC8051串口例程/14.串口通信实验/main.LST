@@ -1,0 +1,65 @@
+C51 COMPILER V9.54   MAIN                                                                  05/31/2025 10:25:49 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: D:\Keil5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND TABS(2)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          
+   3          // ÅäÖÃ´®¿ÚÍ¨ÐÅ³õÊ¼»¯
+   4          void uart_init(unsigned int baud)
+   5          {
+   6   1        TMOD |= 0X20; // ÉèÖÃ¼ÆÊýÆ÷¹¤×÷·½Ê½2
+   7   1        SCON = 0X50; // ÉèÖÃÎª¹¤×÷·½Ê½1
+   8   1        PCON = 0X80; // ²¨ÌØÂÊ¼Ó±¶
+   9   1        TH1 = baud; // ¼ÆÊýÆ÷³õÊ¼ÖµÉèÖÃ
+  10   1        TL1 = baud;
+  11   1      
+  12   1        // ÅäÖÃÖÐ¶ÏÆ÷
+  13   1        ES = 1; // ´ò¿ª½ÓÊÕÖÐ¶Ï
+  14   1        EA = 1; // ´ò¿ª×ÜÖÐ¶Ï
+  15   1        TR1 =1 ; // ´ò¿ª¼ÆÊýÆ÷    
+  16   1      }
+  17          // ÉÏÃæ´úÂëÀí½â×îºÃ£¬ÆäÊµÕæÕýÊ¹ÓÃµÄÊ±ºòÎÒÃÇÍùÍù¶¼ÊÇ¸´ÖÆÕ³Ìù£¬È»ºóÐÞ¸ÄÒ»Ð©²ÎÊý£¬±ÈÈç²¨ÌØÂÊ£¬Êý¾ÝÎ»£¬Ð£ÑéÎ»µ
+             -ÈµÈ¡£
+  18          
+  19          // ´®¿ÚÍ¨ÐÅÖÐ¶Ïº¯Êý
+  20          void uart() interrupt 4
+  21          {
+  22   1        unsigned int rec_data; // ½ÓÊÕµ½µÄÊý¾Ý
+  23   1                            
+  24   1        RI = 0; // Çå³ý½ÓÊÕÖÐ¶Ï±êÖ¾Î»
+  25   1      
+  26   1        rec_data = SBUF; // ´æ´¢½ÓÊÕµ½µÄÊý¾Ý
+  27   1        SBUF = rec_data; // ½«½ÓÊÕµ½µÄÊý¾Ý·ÅÈëµ½·¢ËÍ¼Ä´æÆ÷
+  28   1      
+  29   1        while(!TI); // µÈ´ý·¢ËÍÊý¾ÝÍê³É
+  30   1        TI = 0; // Çå³ý·¢ËÍÍê³É±êÖ¾Î»       
+  31   1      }
+  32          
+  33          void main()
+  34          { 
+  35   1        uart_init(0XFA); // ²¨ÌØÂÊÎª9600
+  36   1      
+  37   1        while(1)
+  38   1        {     
+  39   2                    
+  40   2        }   
+  41   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     52    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,424 @@
+C51 COMPILER V9.54   MAIN                                                                  06/01/2025 22:14:02 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main.l
+                    -st) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Timer0.h"
+   3          #include "Key.h"
+   4          #include "Nixie.h"
+   5          #include "Delay.h"
+   6          #include "AT24C02.h"
+   7          
+   8          unsigned char KeyNum;
+   9          unsigned char Min,Sec,MiniSec;
+  10          unsigned char RunFlag;
+  11          
+  12          // 模式控制变量
+  13          #define MODE_TIMER 0       // 计时器模式
+  14          #define MODE_COUNTDOWN 1   // 倒计时模式
+  15          unsigned char CurrentMode = MODE_TIMER;  // 默认为计时器模式
+  16          
+  17          // 倒计时设置值
+  18          unsigned char CDMin = 1, CDSec = 0, CDMiniSec = 0; // 倒计时默认值：1分钟
+  19          
+  20          // LED灯的定义
+  21          #define LED P2_0
+  22          #define CD_LED1 P2_5      // 倒计时结束指示灯1
+  23          #define CD_LED2 P2_6      // 倒计时结束指示灯2
+  24          #define CD_LED3 P2_7      // 倒计时结束指示灯3
+  25          unsigned char led_state = 1;    
+  26          unsigned char DEAL_LED = 0; //正确处理指令后，再闪灯
+  27          // 定义通信协议
+  28          #define FRAME_HEADER 0x05  // 帧头
+  29          #define FRAME_FOOTER 0x26  // 帧尾
+  30          
+  31          //计时器指令
+  32          #define CMD_STOP_OR_CONTINUE 0x30 // 命令：暂停/继续计时器 
+  33          #define CMD_RESET 0x31 //命令：RESET计时器
+  34          #define CMD_WRITE_AT 0x32 //命令：将当前时间放入AT存储器
+  35          #define CMD_READ_AT 0x33 //命令：读取AT存储器，覆盖当前时间
+  36          
+  37          // 模式切换指令
+  38          #define CMD_MODE_TIMER 0x40      // 切换到计时器模式
+  39          #define CMD_MODE_COUNTDOWN 0x41  // 切换到倒计时模式
+  40          
+  41          // 倒计时控制指令
+  42          #define CMD_CD_PAUSE_CONTINUE 0x50  // 倒计时暂停/继续
+  43          #define CMD_CD_RESET 0x51          // 倒计时复位到设定值
+  44          #define CMD_CD_SET_TIME 0x52       // 设置倒计时时间
+  45          
+  46          // 通信协议变量
+  47          unsigned char rx_state = 0;     // 接收状态：0-等待帧头，1-等待操作数，2-等待数据低�
+             -�节，3-等待数据高字节，4-等待帧尾
+  48          unsigned char rx_command = 0;   // 接收到的操作数
+  49          unsigned int rx_time_data = 0;  // 接收到的时间数据（秒数）
+  50          unsigned char rx_time_low = 0;  // 接收到的时间数据低字节
+  51          unsigned char rx_time_high = 0; // 接收到的时间数据高字节
+  52          
+  53          void uart_init(unsigned int baud) //9600:0XFA
+C51 COMPILER V9.54   MAIN                                                                  06/01/2025 22:14:02 PAGE 2   
+
+  54          {
+  55   1        TMOD |= 0X20; // 设置计数器工作方式2
+  56   1        SCON = 0X50; // 设置为工作方式1
+  57   1        PCON = 0X80; // 波特率加倍
+  58   1        TH1 = baud; // 计数器初始值设置
+  59   1        TL1 = baud;
+  60   1      
+  61   1        // 配置中断器
+  62   1        ES = 1; // 打开接收中断
+  63   1        EA = 1; // 打开总中断
+  64   1        TR1 =1 ; // 打开计数器   
+  65   1      }
+  66          
+  67          // 将所有倒计时指示LED设置为指定状态
+  68          void SetCountdownLEDs(bit state)
+  69          {
+  70   1          CD_LED1 = state;
+  71   1          CD_LED2 = state;
+  72   1          CD_LED3 = state;
+  73   1      }
+  74          
+  75          void main()
+  76          {
+  77   1        Timer0_Init();
+  78   1        uart_init(0XFA); // 波特率为9600
+  79   1        // 初始化LED状态
+  80   1        LED = 0;  // 初始状态为点亮(低电平)
+  81   1        led_state = 0;
+  82   1        
+  83   1        // 初始化倒计时LED为熄灭状态
+  84   1        SetCountdownLEDs(1);  // 高电平熄灭
+  85   1        
+  86   1        while(1)
+  87   1        {
+  88   2          // 处理按键和命令
+  89   2          if(KeyNum==1)     // K1按键按下
+  90   2          {
+  91   3            if(CurrentMode == MODE_TIMER)
+  92   3            {
+  93   4              RunFlag=!RunFlag;    // 计时器模式：启动标志位翻转
+  94   4            }
+  95   3            else // 倒计时模式
+  96   3            {
+  97   4              RunFlag=!RunFlag;    // 倒计时模式也使用相同的运行标志
+  98   4            }
+  99   3            KeyNum = 0; //处理完成，状态复位
+ 100   3            DEAL_LED=1;
+ 101   3          }
+ 102   2          if(KeyNum==2)     // K2按键按下
+ 103   2          {
+ 104   3            if(CurrentMode == MODE_TIMER)
+ 105   3            {
+ 106   4              Min=0;              // 计时器模式：分秒清0
+ 107   4              Sec=0;
+ 108   4              MiniSec=0;
+ 109   4            }
+ 110   3            else // 倒计时模式
+ 111   3            {
+ 112   4              Min=CDMin;          // 倒计时模式：复位到设定值
+ 113   4              Sec=CDSec;
+ 114   4              MiniSec=CDMiniSec;
+ 115   4              SetCountdownLEDs(1); // 复位指示灯
+C51 COMPILER V9.54   MAIN                                                                  06/01/2025 22:14:02 PAGE 3   
+
+ 116   4            }
+ 117   3            KeyNum = 0; //处理完成，状态复位
+ 118   3      
+ 119   3          }
+ 120   2          if(KeyNum==3)     //K3按键按下
+ 121   2          {
+ 122   3            AT24C02_WriteByte(0,Min); //将分秒写入AT24C02
+ 123   3            Delay(5);
+ 124   3            AT24C02_WriteByte(1,Sec);
+ 125   3            Delay(5);
+ 126   3            AT24C02_WriteByte(2,MiniSec);
+ 127   3            Delay(5);
+ 128   3            KeyNum = 0; //处理完成，状态复位
+ 129   3      
+ 130   3          }
+ 131   2          if(KeyNum==4)     //K4按键按下
+ 132   2          {
+ 133   3            Min=AT24C02_ReadByte(0);  //读出AT24C02数据
+ 134   3            Sec=AT24C02_ReadByte(1);
+ 135   3            MiniSec=AT24C02_ReadByte(2);
+ 136   3            KeyNum = 0; //处理完成，状态复位
+ 137   3      
+ 138   3          }
+ 139   2          // 显示当前时间
+ 140   2          Nixie_SetBuf(1,Min/10);    //设置显示缓存，显示数据
+ 141   2          Nixie_SetBuf(2,Min%10);
+ 142   2          Nixie_SetBuf(3,11);
+ 143   2          Nixie_SetBuf(4,Sec/10);
+ 144   2          Nixie_SetBuf(5,Sec%10);
+ 145   2          Nixie_SetBuf(6,11);
+ 146   2          Nixie_SetBuf(7,MiniSec/10);
+ 147   2          Nixie_SetBuf(8,MiniSec%10);
+ 148   2        }
+ 149   1      }
+ 150          
+ 151          /**
+ 152            * @brief  时间驱动函数，在中断中调用，根据当前模式执行不同操作
+ 153            * @param  无
+ 154            * @retval 无
+ 155            */
+ 156          void Sec_Loop(void)
+ 157          {
+ 158   1        if(RunFlag)
+ 159   1        {
+ 160   2          if(CurrentMode == MODE_TIMER) // 计时器模式
+ 161   2          {
+ 162   3            MiniSec++;
+ 163   3            if(MiniSec>=100)
+ 164   3            {
+ 165   4              MiniSec=0;
+ 166   4              Sec++;
+ 167   4              if(Sec>=60)
+ 168   4              {
+ 169   5                Sec=0;
+ 170   5                Min++;
+ 171   5                if(Min>=60)
+ 172   5                {
+ 173   6                  Min=0;
+ 174   6                }
+ 175   5              }
+ 176   4            }
+ 177   3          }
+C51 COMPILER V9.54   MAIN                                                                  06/01/2025 22:14:02 PAGE 4   
+
+ 178   2          else // 倒计时模式
+ 179   2          {
+ 180   3            if(Min==0 && Sec==0 && MiniSec==0)
+ 181   3            {
+ 182   4              // 倒计时已经结束，停止运行
+ 183   4              RunFlag = 0;
+ 184   4              
+ 185   4              // 点亮指示灯
+ 186   4              SetCountdownLEDs(0);  // 低电平点亮
+ 187   4              Delay(1000);         // 延时1秒
+ 188   4              SetCountdownLEDs(1);  // 熄灭指示灯
+ 189   4              
+ 190   4              return;
+ 191   4            }
+ 192   3            
+ 193   3            // 倒计时逻辑
+ 194   3            if(MiniSec==0)
+ 195   3            {
+ 196   4              if(Sec==0)
+ 197   4              {
+ 198   5                if(Min!=0)
+ 199   5                {
+ 200   6                  Min--;
+ 201   6                  Sec=59;
+ 202   6                  MiniSec=99;
+ 203   6                }
+ 204   5              }
+ 205   4              else
+ 206   4              {
+ 207   5                Sec--;
+ 208   5                MiniSec=99;
+ 209   5              }
+ 210   4            }
+ 211   3            else
+ 212   3            {
+ 213   4              MiniSec--;
+ 214   4            }
+ 215   3          }
+ 216   2        }
+ 217   1      }
+ 218          
+ 219          // 串口通信中断函数
+ 220          void uart() interrupt 4
+ 221          {
+ 222   1        unsigned char rec_data; // 接收到的数据
+ 223   1                            
+ 224   1        RI = 0; // 清除接收中断标志位
+ 225   1      
+ 226   1        rec_data = SBUF; // 存储接收到的数据
+ 227   1        SBUF = rec_data; // 将接收到的数据放入到发送寄存器
+ 228   1        
+ 229   1        // 根据当前状态处理接收到的数据
+ 230   1        switch (rx_state) {
+ 231   2          case 0: // 等待帧头
+ 232   2            if (rec_data == FRAME_HEADER) {
+ 233   3              rx_state = 1; // 进入等待操作数状态
+ 234   3            }
+ 235   2            break;
+ 236   2            
+ 237   2          case 1: // 等待操作数
+ 238   2            rx_command = rec_data; // 保存操作数
+ 239   2            if (rx_command == CMD_CD_SET_TIME) { 
+C51 COMPILER V9.54   MAIN                                                                  06/01/2025 22:14:02 PAGE 5   
+
+ 240   3              rx_state = 2; // 如果是设置时间命令，进入等待数据低字节状态
+ 241   3            } else {
+ 242   3              rx_state = 4; // 否则直接进入等待帧尾状态
+ 243   3            }
+ 244   2            break;
+ 245   2            
+ 246   2          case 2: // 等待数据低字节
+ 247   2            rx_time_low = rec_data;  // 保存时间数据低字节
+ 248   2            rx_state = 3;  // 进入等待数据高字节状态
+ 249   2            break;
+ 250   2            
+ 251   2          case 3: // 等待数据高字节
+ 252   2            rx_time_high = rec_data;  // 保存时间数据高字节
+ 253   2            rx_state = 4;  // 进入等待帧尾状态
+ 254   2            break;
+ 255   2            
+ 256   2          case 4: // 等待帧尾
+ 257   2            if (rec_data == FRAME_FOOTER) 
+ 258   2            {
+ 259   3              // 完整接收到一帧数据，根据操作数执行相应操作
+ 260   3              
+ 261   3              // 计时器模式命令
+ 262   3              if (rx_command == CMD_STOP_OR_CONTINUE && CurrentMode == MODE_TIMER)
+ 263   3              {
+ 264   4                KeyNum = 1; //计时器暂停/继续
+ 265   4                DEAL_LED=1;
+ 266   4              }
+ 267   3              else if (rx_command == CMD_RESET && CurrentMode == MODE_TIMER)
+ 268   3              {
+ 269   4                KeyNum = 2; //计时器复位
+ 270   4                DEAL_LED=1;
+ 271   4              }
+ 272   3              else if (rx_command == CMD_WRITE_AT)
+ 273   3              {
+ 274   4                KeyNum = 3; //将当前时间写入AT24C02
+ 275   4                DEAL_LED=1;
+ 276   4              }
+ 277   3              else if (rx_command == CMD_READ_AT)
+ 278   3              {
+ 279   4                KeyNum = 4; //从AT24C02读取时间
+ 280   4                DEAL_LED=1;
+ 281   4              }
+ 282   3              // 模式切换命令
+ 283   3              else if (rx_command == CMD_MODE_TIMER)
+ 284   3              {
+ 285   4                CurrentMode = MODE_TIMER;
+ 286   4                RunFlag = 0;  // 切换模式时停止计时
+ 287   4                Min = 0;
+ 288   4                Sec = 0;
+ 289   4                MiniSec = 0;
+ 290   4                DEAL_LED=1;
+ 291   4              }
+ 292   3              else if (rx_command == CMD_MODE_COUNTDOWN)
+ 293   3              {
+ 294   4                CurrentMode = MODE_COUNTDOWN;
+ 295   4                RunFlag = 0;  // 切换模式时停止计时
+ 296   4                Min = CDMin;  // 设置为默认倒计时值
+ 297   4                Sec = CDSec;
+ 298   4                MiniSec = CDMiniSec;
+ 299   4                DEAL_LED=1;
+ 300   4              }
+ 301   3              // 倒计时控制命令
+C51 COMPILER V9.54   MAIN                                                                  06/01/2025 22:14:02 PAGE 6   
+
+ 302   3              else if (rx_command == CMD_CD_PAUSE_CONTINUE && CurrentMode == MODE_COUNTDOWN)
+ 303   3              {
+ 304   4                if (CurrentMode == MODE_COUNTDOWN)
+ 305   4                {
+ 306   5                  KeyNum = 1; // 倒计时暂停/继续
+ 307   5                }
+ 308   4                DEAL_LED=1;
+ 309   4              }
+ 310   3              else if (rx_command == CMD_CD_RESET && CurrentMode == MODE_COUNTDOWN)
+ 311   3              {
+ 312   4                if (CurrentMode == MODE_COUNTDOWN)
+ 313   4                {
+ 314   5                  KeyNum = 2; // 倒计时复位到设定值
+ 315   5                }
+ 316   4                DEAL_LED=1;
+ 317   4              }
+ 318   3              // 设置倒计时时间
+ 319   3              else if (rx_command == CMD_CD_SET_TIME && CurrentMode == MODE_COUNTDOWN) 
+ 320   3              {
+ 321   4        
+ 322   4                // 合并两个字节得到总秒数
+ 323   4                rx_time_data = (unsigned int)rx_time_high << 8 | rx_time_low;
+ 324   4                if (rx_time_data > 3599) // 最大支持59分59秒
+ 325   4                {
+ 326   5                  rx_time_data = 3599; // 限制最大值为59分59秒
+ 327   5                }
+ 328   4                else if (rx_time_data <= 1) // 最小值为1秒
+ 329   4                {
+ 330   5                  rx_time_data = 1; // 限制最小值为1秒
+ 331   5                }
+ 332   4                // 计算分和秒
+ 333   4                CDMin = rx_time_data / 60;
+ 334   4                CDSec = rx_time_data % 60;
+ 335   4                CDMiniSec = 0;
+ 336   4                
+ 337   4                // 如果当前是倒计时模式并且没有在运行，则立即更新显示
+ 338   4                if (CurrentMode == MODE_COUNTDOWN && RunFlag == 0)
+ 339   4                {
+ 340   5                  Min = CDMin;
+ 341   5                  Sec = CDSec;
+ 342   5                  MiniSec = CDMiniSec;
+ 343   5                }
+ 344   4                DEAL_LED=1;
+ 345   4              }
+ 346   3              if (DEAL_LED) // 如果需要闪烁LED指示
+ 347   3              {
+ 348   4                // 执行LED闪烁 指示收到了UART数据包 并处理了
+ 349   4                LED = 0;  // 点亮LED (低电平点亮)
+ 350   4                Delay(50);  // 延时50ms
+ 351   4                LED = 1;  // 熄灭LED
+ 352   4              }
+ 353   3      
+ 354   3            }
+ 355   2            // 不管帧尾是否正确，都回到等待帧头状态
+ 356   2            rx_state = 0;
+ 357   2            break;
+ 358   2        }
+ 359   1      
+ 360   1        while(!TI); // 等待发送数据完成
+ 361   1        TI = 0; // 清除发送完成标志位        
+ 362   1      }
+ 363          
+C51 COMPILER V9.54   MAIN                                                                  06/01/2025 22:14:02 PAGE 7   
+
+ 364          void Timer0_Routine() interrupt 1
+ 365          {
+ 366   1        static unsigned int T0Count1,T0Count2,T0Count3;
+ 367   1        TL0 = 0x18;   //设置定时初值
+ 368   1        TH0 = 0xFC;   //设置定时初值
+ 369   1        T0Count1++;
+ 370   1        if(T0Count1>=20)
+ 371   1        {
+ 372   2          T0Count1=0;
+ 373   2          Key_Loop(); //20ms调用一次按键驱动函数
+ 374   2        }
+ 375   1        T0Count2++;
+ 376   1        if(T0Count2>=2)
+ 377   1        {
+ 378   2          T0Count2=0;
+ 379   2          Nixie_Loop();//2ms调用一次数码管驱动函数
+ 380   2        }
+ 381   1        T0Count3++;
+ 382   1        if(T0Count3>=10)
+ 383   1        {
+ 384   2          T0Count3=0;
+ 385   2          Sec_Loop(); //10ms调用一次数秒表驱动函数
+ 386   2        }
+ 387   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    966    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     23    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
